@@ -92,9 +92,9 @@ export default {
         random() {
             let index = Math.floor(Math.random() * this.songs.length)
             this.$store.commit('setMode', 2) // 设置随机播放
-            this.$store.commit('setCurrentIndex', index) // 传递当前播放歌曲索引
             this.$store.commit('setPlayList', this.songs) // 传递当前播放歌曲列表
-            this.$store.commit('setSequenceList', this.songs) // 传递顺序播放列表
+            this.$store.commit('setRandomList', this.songs) // 传递顺序播放列表
+            this.$store.commit('setCurrentIndex', index) // 传递当前播放歌曲索引
             this.$store.commit('setFullScreen',true) // 传递当前播放歌曲列表
         }
     },

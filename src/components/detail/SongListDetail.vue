@@ -23,6 +23,7 @@ export default {
             if (!this.songList.id) { 
                 // 解决刷新时候让他返回
                 this.$router.back()
+                return
             }
             this.songs = []
             const { data: res}= await request({

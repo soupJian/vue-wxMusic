@@ -36,9 +36,15 @@ export default {
     methods: {
         // 点击歌曲进行播放
         selectItem(item,index) {
-            item.dt = item.duration
-            item.ar = item.artists
-            item.al = item.album
+            if(!item.dt){
+                item.dt = item.duration
+            }
+            if(!item.al){
+                item.ar = item.artists
+            }
+            if(!item.al){
+                item.al = item.album
+            }
             this.$store.commit('setPlayList', this.songs) // 传递当前播放歌曲列表
             this.$store.commit('setRandomList', this.songs) // 传递顺序播放列表
             this.$store.commit('setCurrentIndex', index) // 传递当前播放歌曲索引

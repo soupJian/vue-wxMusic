@@ -44,7 +44,8 @@ export default {
                 /* 可以触发点击事件*/
 				click: this.click,
 				scrollX: true,
-				dblclick: this.dblclick
+				dblclick: this.dblclick,
+				observeDOM: true
 			})
 			if (this.listenScroll) {
                 let me = this
