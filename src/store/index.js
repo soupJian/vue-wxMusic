@@ -64,7 +64,11 @@ export default new Vuex.Store({
     // 设置当前播放歌曲索引
     setCurrentIndex(state,index){
       state.currentIndex = index
-      state.currentSong = state.randomList[state.currentIndex]
+      if(index == -1){
+        state.currentSong = {}
+      }else{
+        state.currentSong = state.randomList[state.currentIndex]
+      }
     },
     // 控制播放模式
     setMode(state,mode) {

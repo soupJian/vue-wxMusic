@@ -11,7 +11,7 @@
             <scroll :list="hotComment" class="scroll_comment" :pullUp="pullUp" @scrollToEnd="getMoreComment" ref="scroll">
                 <div class="item">
                     <ul ref="ul">
-                        <li v-for="item of hotComment" :key="item.parentCommentId">
+                        <li v-for="(item,index) of hotComment" :key="index">
                             <img v-lazy="item.user.avatarUrl">
                             <div class="detail">
                                 <p class="comment_info">{{item.user.nick}}</p>

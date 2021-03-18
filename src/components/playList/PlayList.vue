@@ -24,7 +24,7 @@
                                 </span>
                                 <span class="item_operator">
                                     <i :class="getFavoriteIcon(item)" @click.stop="toggleFavorite(item)"></i>
-                                    <i class="icon-delete" @click.stop="deleteOne(index)"></i>
+                                    <i class="icon-delete" @click.stop="deleteOne(item)"></i>
                                 </span>
                             </div>
                         </div>
@@ -35,7 +35,7 @@
                 关闭
             </div>
             <confirm ref="confirm" text="是否清空列表" confirmBtnText="清空"
-                    @confirm="clearSearchHistory"
+                    @confirm="deleteAll"
             ></confirm>
         </div>
     </transition>
@@ -65,8 +65,9 @@ export default {
         ...mapState({
             currentSong: 'currentSong',
             playList:'playList',
+            randomList: 'randomList',
             mode: 'mode',
-            currentIndex: 'currentIndex'
+            currentIndex: 'currentIndex',
         }),
         // 播放模式图标
         iconMode() {
@@ -87,26 +88,32 @@ export default {
             this.showFlag = false
         },
         // 删除某一首歌
-        deleteOne(index) {
+        deleteOne(music) {
+            let index;
+            // if(music.id == this.currentSong.id){ // 删除的是当前这首歌
+            //     this.$store.commit('setCurrentIndex',this.currentIndex-1)
+            //     return
+            // }
+            index = this.randomList.findIndex(item=>{
+                return item.id == music.id
+            })
+            this.randomList.splice(index,1)
+            index = this.playList.findIndex(item=>{
+                return item.id == music.id
+            })
             this.playList.splice(index,1)
-            if(index < this.currentIndex) {
-                 this.$store.commit('setCurrentIndex',this.currentIndex-1)
-            }
-            if(index == this.playList.length) {
-                this.$store.commit("setCurrentIndex", 0)
-            }
             // 清空了列表
-            if(this.playList.length == 0) {
+            if(this.randomList.length == 0) {
                 this.deleteAll()
             }
             this.$store.commit('setPlayList',this.playList)
-            this.$store.commit('setSequenceList',this.playList)
+            this.$store.commit('setRandomList',this.randomList)
         },
         deleteAll() {
             this.hide()
-            this.$store.commit("setPlayList", [])
             this.$store.commit("setCurrentIndex", -1)
-            this.$store.commit("setSequenceList", [])
+            this.$store.commit("setPlayList", [])
+            this.$store.commit("setRandomList", [])
             this.$store.commit("setPlaying", false)
         },
         // 切换歌曲
@@ -119,9 +126,6 @@ export default {
         },
         showConfirm(){
             this.$refs.confirm.show()
-        },
-        clearSearchHistory() {
-            this.deleteAll()
         }
     },
     watch: {

@@ -5,7 +5,7 @@
             <div class="normal-player" v-show="fullScreen">
                 <!-- 背景图 -->
                 <div class="background">
-                    <img width="100%" height="100%" :src="imgsrc"/>
+                    <img width="100%" height="100%" v-lazy="imgsrc"/>
                 </div>
                 <!-- 头部 -->
                 <div class="top">
@@ -26,7 +26,7 @@
                     <div class="middle-l" ref="middleL">
                         <div class="cd-wrapper" ref="cdWrapper">
                             <div class="cd">
-                                <img class="image" :src="imgsrc" :class="rorate"/>
+                                <img class="image" v-lazy="imgsrc" :class="rorate"/>
                             </div>
                         </div>
                         <!-- 当前播放的歌词 -->
@@ -94,7 +94,7 @@
         <transition name="mini">
             <div class="mini-player" v-show="!fullScreen && currentSong !=  undefined" @click="back(true)">
                 <div class="icon">
-                    <img width="40" height="40" :src="imgsrc" :class="rorate"/>
+                    <img width="40" height="40" v-lazy="imgsrc" :class="rorate"/>
                 </div>
                 <div class="text">
                     <h2 class="name" v-html="currentSong.name"></h2>
@@ -309,7 +309,6 @@ export default {
             const index = arr.findIndex(item => {
                 return item.id == this.currentSong.id;
             })
-            console.log(index);
             this.$store.commit('setCurrentIndex', index)
         },
         // 循环播放
@@ -399,14 +398,14 @@ export default {
     },
     watch: {
         currentSong() {
-            if(!this.currentSong && !this.currentSong.id) {
-                this.$store.commit('setCurrentSong',{})
-                return
+            this.imgsrc = ''
+            if(!this.currentSong.id) {
+                return 
             }
             if(!this.currentSong.picUrl){
                 this.fetchCover(this.currentSong.al.id)
             }else{
-                this.imgsrc = this.currentSong.picUrl
+                this.imgsrc = this.currentSong.al.picUrl
             }
             this.fetchAudioSrc(this.currentSong.id)
             // 防止歌词跳动
