@@ -315,9 +315,6 @@ export default {
         loop() {
             this.$refs.audio.currentTime = 0
             this.$refs.audio.play()
-            if(this.currentLyric) {
-                this.currentLyric.seek(0)
-            }
         },
         // 数组乱序
         shuffle(arr) {
@@ -345,10 +342,6 @@ export default {
             // 拉动bar进度条后设置audio播放时间
             const currentTime = this.currentSong.dt / 1000 * precent
             this.$refs.audio.currentTime = currentTime
-            // 拉动bar进度条后歌词跟着进度条变化到和歌曲一样的
-            if (this.currentLyric) {
-                this.currentLyric.seek(currentTime * 1000)
-            }
         },
         middleTouchStart(e) {
             this.touch.initiated = true
@@ -390,10 +383,6 @@ export default {
         playCurrentLyric(line){
             const currentTime = line.time
             this.$refs.audio.currentTime = currentTime / 1000
-            // 拉动bar进度条后歌词跟着进度条变化到和歌曲一样的
-            if (this.currentLyric) {
-                this.currentLyric.seek(currentTime)
-            }
         }
     },
     watch: {
@@ -425,6 +414,11 @@ export default {
             const audio = this.$refs.audio
             this.playing ? audio.play() : audio.pause()
         },
+        currentTime(){
+            if(this.currentTime && this.currentLyric){
+                this.currentLyric.seek(this.currentTime * 1000)
+            }
+        }
     },
     components: {
         progressBar,

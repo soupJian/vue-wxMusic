@@ -11,16 +11,16 @@ module.exports = {
         {
             "Access-Control-Allow-Origin": "*"
         },
-        // proxy: {
-        //     '/api': {
-        //         target: 'http://www.soupjian.work:3000',   // 需要请求的地址 https://api.qq.jsososo.com
-        //         ws: true,
-        //         secure: false,
-        //         changeOrigin: true,  // 是否跨域
-        //         pathRewrite: {
-        //             '^/api': ''
-        //         }
-        //     }
-        // }  // 配置多个代理
+        proxy: {
+            '/api': {
+                target: 'http://www.soupjian.work:3000',   // 需要请求的地址 https://api.qq.jsososo.com
+                ws: true,
+                secure: false,
+                changeOrigin: true,  // 是否跨域
+                pathRewrite: {
+                    '^/api': ''
+                }
+            }
+        }  // 配置多个代理
     }
   }
