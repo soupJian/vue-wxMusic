@@ -315,6 +315,9 @@ export default {
         loop() {
             this.$refs.audio.currentTime = 0
             this.$refs.audio.play()
+            if(this.currentLyric) {
+                this.currentLyric.seek(0)
+            }
         },
         // 数组乱序
         shuffle(arr) {
@@ -386,9 +389,9 @@ export default {
         }
     },
     watch: {
-        currentSong() {
+        currentSong(nesSong,oldSong) {
             this.imgsrc = ''
-            if(!this.currentSong.id) {
+            if(!this.currentSong.id || nesSong.id == oldSong.id) {
                 return 
             }
             if(!this.currentSong.picUrl){
@@ -415,7 +418,7 @@ export default {
             this.playing ? audio.play() : audio.pause()
         },
         currentTime(){
-            if(this.currentTime && this.currentLyric){
+            if(this.currentTime && this.currentLyric && this.playing){
                 this.currentLyric.seek(this.currentTime * 1000)
             }
         }
