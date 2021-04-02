@@ -67,7 +67,7 @@ export default new Vuex.Store({
       if(index == -1){
         state.currentSong = {}
       }else{
-        state.currentSong = state.randomList[state.currentIndex]
+        state.currentSong = state.randomList[index]
       }
     },
     // 控制播放模式

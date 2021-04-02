@@ -64,14 +64,21 @@ export default {
                 this.randomList.push(this.songItem)
             } else { // 不为空
                 // 检索歌曲是否在原列表中
-                let index = this.randomList.findIndex((item) => {
+                let index
+                index = this.randomList.findIndex((item) => {
                     return item.id === this.songItem.id
                 })
                 if(index>-1) { // 歌曲存在于原列表中,先删除
                     this.randomList.splice(index,1)
                 }
                 this.randomList.splice(this.currentIndex+1,0,this.songItem)
-                this.playList.push(this.songItem)
+                index = this.playList.findIndex(item=>{
+                    return item.id === this.songItem.id
+                })
+                if(index>-1) { // 歌曲存在于原列表中,先删除
+                    this.randomList.splice(index,1)
+                }
+                this.playList.splice(this.currentIndex+1,0,this.songItem)
             }
             this.$store.commit('setPlayList', this.playList) // 传递当前播放歌曲列表
             this.$store.commit('setRandomList', this.randomList) // 传递当前播放歌曲列表

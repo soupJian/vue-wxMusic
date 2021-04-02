@@ -5,7 +5,7 @@ export const request = (params) => {
     return axios.get(url);
   };
   export const requestCookie = (params) => {
-    const baseUrl = 'http://www.soupjian.work:3000';
+    const baseUrl = '/api';
     const cookie = localStorage.getItem('cookie');
     let url = `${baseUrl}${params.url}?cookie=${cookie}`;
     return axios.get(url);

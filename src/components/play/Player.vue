@@ -99,7 +99,7 @@
                 <div class="text">
                     <h2 class="name" v-html="currentSong.name"></h2>
                     <p class="desc">
-                        <span v-for="item of currentSong.singer" :key="item.id">{{item.name}}</span>
+                        <span v-for="item of currentSong.ar" :key="item.id">{{item.name}}</span>
                     </p>
                 </div>
                 <div class="control" @click.stop="changePlaying">
@@ -218,6 +218,9 @@ export default {
         },
         // 获取歌词
         async fetchLyric(id) {
+            if(!id){
+                return
+            }
             const {data: res} = await request({
                 url:'/lyric?id='+id
             })
@@ -390,10 +393,10 @@ export default {
     },
     watch: {
         currentSong(nesSong,oldSong) {
-            this.imgsrc = ''
             if(!this.currentSong.id || nesSong.id == oldSong.id) {
                 return 
             }
+            this.imgsrc = ''
             if(!this.currentSong.picUrl){
                 this.fetchCover(this.currentSong.al.id)
             }else{

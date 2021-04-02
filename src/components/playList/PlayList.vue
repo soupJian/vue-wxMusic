@@ -17,7 +17,7 @@
                 <div class="scroll">
                     <scroll class="playlist_item" :list="playList" ref="scroll">
                         <div>
-                            <div class="item" v-for="(item,index) of playList" :key="item.id" @click="changeSong(index)">
+                            <div class="item" v-for="item of playList" :key="item.id" @click="changeSong(item)">
                                 <span class="item_name">
                                     <span class="current" :class="item.id===currentSong.id?'icon-play':''"></span>
                                     <span class="name">{{item.name}}</span>
@@ -89,25 +89,32 @@ export default {
         },
         // 删除某一首歌
         deleteOne(music) {
+            if(this.randomList.length == 1){
+                this.deleteAll()
+                return
+            }
             let index;
-            // if(music.id == this.currentSong.id){ // 删除的是当前这首歌
-            //     this.$store.commit('setCurrentIndex',this.currentIndex-1)
-            //     return
-            // }
             index = this.randomList.findIndex(item=>{
                 return item.id == music.id
             })
+            let current 
+            if(index == this.randomList.length -1){
+                current = 0
+            }
+            else if(index >= this.currentIndex){
+                current = this.currentIndex
+            }
+            else if(index < this.currentIndex){
+                current = this.currentIndex - 1
+            }
             this.randomList.splice(index,1)
+            this.$store.commit('setRandomList',this.randomList)
+            this.$store.commit("setCurrentIndex", current)
             index = this.playList.findIndex(item=>{
                 return item.id == music.id
             })
             this.playList.splice(index,1)
-            // 清空了列表
-            if(this.randomList.length == 0) {
-                this.deleteAll()
-            }
-            this.$store.commit('setPlayList',this.playList)
-            this.$store.commit('setRandomList',this.randomList)
+            this.$store.commit('setPlayList',this.randomList)
         },
         deleteAll() {
             this.hide()
@@ -117,7 +124,10 @@ export default {
             this.$store.commit("setPlaying", false)
         },
         // 切换歌曲
-        changeSong(index) {
+        changeSong(song) {
+            const index = this.randomList.findIndex(item=>{
+                return item.id == song.id
+            })
             this.$store.commit("setCurrentIndex",index)
         },
         // 改变播放模式
