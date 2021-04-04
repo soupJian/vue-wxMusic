@@ -14,7 +14,7 @@
                         <li v-for="(item,index) of hotComment" :key="index">
                             <img v-lazy="item.user.avatarUrl">
                             <div class="detail">
-                                <p class="comment_info">{{item.user.nick}}</p>
+                                <p class="comment_info">{{item.user.nickname}}</p>
                                 <p class="comment_detail" v-html="item.content"></p>
                             </div>
                         </li>
