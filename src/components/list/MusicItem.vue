@@ -51,7 +51,6 @@ export default {
             this.$store.commit('setFullScreen',true) // 传递当前播放歌曲列表
         },
         addSong(item){
-            console.log(item);
             this.$store.commit("setSongItem",item)
         },
         isPlayList(item) {

@@ -3,7 +3,7 @@
         <div class="operator" v-show="songItem.id" @click="hide">
             <div class="operator_wrap" @click.stop>
                 <div class="operator_header">
-                    <img :src="imgsrc" alt="">
+                    <img v-lazy="imgsrc" alt="">
                     <div class="title">
                         <p class="name">歌曲：{{songItem.name}}</p>
                         <p class="text">
@@ -40,21 +40,40 @@
 </template>
 <script>
 import { mapState } from 'vuex'
+import {request} from '../../common/js/request'
 import {playerMixin} from '../../common/js/mixin'
 export default {
     mixins: [playerMixin],
+    data(){
+        return{
+            imgsrc: ''
+        }
+    },
     computed: {
         ...mapState({
             songItem: 'songItem',
             playList: 'playList',
             randomList: 'randomList',
             currentIndex: 'currentIndex'
-        }),
-        imgsrc(){  // 图片地址
-          return JSON.stringify(this.songItem) == '{}' ? '': this.songItem.al.picUrl
-      },
+        })
     },
     methods:{
+        async getCover(){
+            let id
+            if(this.songItem.album){
+                id = this.songItem.album.id
+            }
+            else if(this.songItem.al){
+                id = this.songItem.al.id
+            }
+            if(id == undefined) {
+                return
+            }
+            const {data:res} = await request({
+                url: '/album?id='+id
+            })
+            this.imgsrc =  res.album.picUrl
+        },
         hide() {
             this.$store.commit('setSongItem',{})
         },
@@ -94,6 +113,12 @@ export default {
             this.hide()
             const id = item.id
             this.$router.push('/comment/'+id)
+        }
+    },
+    watch:{
+        songItem(){
+            this.imgsrc = ''
+            this.getCover()
         }
     }
 }
