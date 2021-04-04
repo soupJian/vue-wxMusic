@@ -7,7 +7,7 @@
           </div>
           <div class="text">
             <h2 class="name" v-html="item.name"></h2>
-            <p class="desc" v-html="item.copywriter || item.description"></p>
+            <p class="desc" v-html="item.copywriter || item.description || item.albumSinger"></p>
           </div>
         </li>
       </ul>

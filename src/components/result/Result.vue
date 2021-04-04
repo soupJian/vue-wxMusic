@@ -154,6 +154,13 @@ export default {
                     return
                 }
                 this.resultAlbum = res.result.albums
+                this.resultAlbum.forEach(item=>{
+                    let str = ''
+                    item.artists.forEach(list =>{
+                        str += list.name + ' / '
+                    })
+                    item.albumSinger = str.slice(0,str.length - 3)
+                })
             }
             if(this.type == 100){
                 if(res.result.artistCount == 0){
