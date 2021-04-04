@@ -98,7 +98,7 @@ export default {
                 return item.id == music.id
             })
             let current 
-            if(index == this.randomList.length -1){
+            if(index == this.currentIndex && this.currentIndex == this.randomList.length - 1){
                 current = 0
             }
             else if(index >= this.currentIndex){
