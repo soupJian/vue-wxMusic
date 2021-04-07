@@ -142,10 +142,10 @@ export default {
             imgsrc: null, // 图片地址
             currentTime: 0, // 音频目前播放时间
             currentLyric: [] , // 歌词对象
-            currentLineNum: 0, // 当前播放那个的歌词行数
             playingLyric: '', // 当前播放的歌词
             currentShow: 'cd', // 当前展示的是歌词还是cd
-            touch: {} // 是否手指滑动状态
+            touch: {}, // 是否手指滑动状态
+            time: -1,// 滑动歌词滚动延时
         }
     },
     computed: {
@@ -236,7 +236,6 @@ export default {
                 // 获取不到歌词清空
                 this.currentLyric = []
                 this.playingLyric = ''
-                this.currentLineNum = 0
             }
         },
         // 音频加载成功，可以播放
@@ -333,9 +332,17 @@ export default {
                 ) {
                     // 设置当前播放歌词
                     this.currentLyric[i].currentLine = true;
-                    if (i > 5) {
+                    this.playingLyric = this.currentLyric[i].line
+                    if (i > 5) { // 歌词 > 5 并且手指处于非滑动状态
                         let lineEl = this.$refs.lyricLine[i - 5]
-                        this.$refs.lyricList.scrollToElement(lineEl, 1000)// 滚动到元素
+                        if(this.touch.initiated){
+                            clearTimeout(this.time)
+                            this.time = setTimeout(()=>{
+                                this.$refs.lyricList.scrollToElement(lineEl, 1000)// 滚动到元素
+                            },2000)
+                        }else{
+                            this.$refs.lyricList.scrollToElement(lineEl, 1000)// 滚动到元素
+                        }
                     }
                 } else {
                     this.currentLyric[i].currentLine = false;
@@ -412,7 +419,6 @@ export default {
             if (this.currentLyric) {
                 this.currentLyric = []
                 this.playingLyric = ''
-                this.currentLineNum = 0
             }
             clearTimeout(this.timer)
             this.timer = setTimeout(() => {
