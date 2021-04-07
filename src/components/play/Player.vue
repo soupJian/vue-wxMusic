@@ -35,18 +35,18 @@
                         </div>
                     </div>
                     <!-- 右边歌词 -->
-                    <scroll class="middle-r" ref="lyricList" :list="currentLyric && currentLyric.lines">
+                    <scroll class="middle-r" ref="lyricList" :list="currentLyric">
                         <div class="lyric-wrapper">
-                            <div v-if="currentLyric">
-                                <p ref="lyricLine" 
+                            <div v-if="currentLyric.length > 0">
+                                <p ref="lyricLine"
                                     class="text"
-                                    v-for="(line, index) in currentLyric.lines"
+                                    v-for="(item, index) in currentLyric"
                                     :key="index"
-                                    :class="{'current': currentLineNum === index}"
-                                    @dblclick="playCurrentLyric(line)">
-                                    {{line.txt}}
+                                    :class="{'current': item.currentLine}"
+                                    @dblclick="playCurrentLyric(item)">
+                                    {{item.line}}
                                 </p>
-                                <p v-show="currentLyric.lines.length === 0" class="nolyric">
+                                <p v-show="currentLyric.length === 0" class="nolyric">
                                     该歌曲暂无歌词
                                 </p>
                             </div>
@@ -121,7 +121,7 @@
 </template>
 <script>
 import { mapState } from 'vuex'
-import Lyric from 'lyric-parser'
+import {parseLyric} from '@/common/js/lyric.js'
 import progressBar from '../progress-bar/progressBar'
 import scroll from '../base/Scroll'
 import playList from '../playList/PlayList'
@@ -141,7 +141,7 @@ export default {
             },
             imgsrc: null, // 图片地址
             currentTime: 0, // 音频目前播放时间
-            currentLyric: null , // 歌词对象
+            currentLyric: [] , // 歌词对象
             currentLineNum: 0, // 当前播放那个的歌词行数
             playingLyric: '', // 当前播放的歌词
             currentShow: 'cd', // 当前展示的是歌词还是cd
@@ -226,25 +226,18 @@ export default {
             })
             if(res.lrc){
                 // res.data.lyric // 歌词数据
-                this.currentLyric = new Lyric(res.lrc.lyric,this.handleLyric) //this.handleLyric回调函数
-                this.currentLyric.play()
+                this.currentLyric = parseLyric(res.lrc.lyric)
+                this.currentLyric.forEach((item,index)=>{
+                    if(item.line == ''){
+                        this.currentLyric.splice(index,1)
+                    }
+                })
             } else {
                 // 获取不到歌词清空
-                this.currentLyric = null
+                this.currentLyric = []
                 this.playingLyric = ''
                 this.currentLineNum = 0
             }
-        },
-        // 处理歌词播放
-        handleLyric({lineNum, txt}) {
-            this.currentLineNum = lineNum
-            if (lineNum > 5) {
-                let lineEl = this.$refs.lyricLine[lineNum - 5]
-                this.$refs.lyricList.scrollToElement(lineEl, 1000)// 滚动到元素
-            } else {
-                this.$refs.lyricList.scrollTo(0, 0, 1000)// 滚动到顶部
-            }
-            this.playingLyric = txt
         },
         // 音频加载成功，可以播放
         ready() {
@@ -261,10 +254,6 @@ export default {
         changePlaying() {
             if(this.songReady) {
                 this.playing ? this.$store.commit('setPlaying', false) : this.$store.commit('setPlaying',true)
-                if(this.currentLyric) {
-                    // 歌词暂停与播放
-                    this.currentLyric.togglePlay()
-                }
             }
         },
         // 上一首下一首实现 
@@ -319,7 +308,7 @@ export default {
             this.$refs.audio.currentTime = 0
             this.$refs.audio.play()
             if(this.currentLyric) {
-                this.currentLyric.seek(0)
+                // this.currentLyric.seek(0)
             }
         },
         // 数组乱序
@@ -334,7 +323,24 @@ export default {
         // video的时间更新属性
         updateTime(e) {
             // e.target.currentTime 就是歌曲当前播放时间
+            const len = this.currentLyric.length
             this.currentTime = e.target.currentTime
+            for(let i = 0; i < len -1 ; i ++){
+                if (
+                    i != len - 1 &&
+                    this.currentLyric[i].time <= this.currentTime &&
+                    this.currentLyric[i + 1].time > this.currentTime
+                ) {
+                    // 设置当前播放歌词
+                    this.currentLyric[i].currentLine = true;
+                    if (i > 5) {
+                        let lineEl = this.$refs.lyricLine[i - 5]
+                        this.$refs.lyricList.scrollToElement(lineEl, 1000)// 滚动到元素
+                    }
+                } else {
+                    this.currentLyric[i].currentLine = false;
+                }
+            }
         },
         // 解决时间显示问题
         forMat(interval) {
@@ -386,9 +392,8 @@ export default {
             this.$refs.playList.show()
         },
         // 双击歌词播放
-        playCurrentLyric(line){
-            const currentTime = line.time
-            this.$refs.audio.currentTime = currentTime / 1000
+        playCurrentLyric(item){
+            this.$refs.audio.currentTime = item.time
         }
     },
     watch: {
@@ -405,8 +410,7 @@ export default {
             this.fetchAudioSrc(this.currentSong.id)
             // 防止歌词跳动
             if (this.currentLyric) {
-                this.currentLyric.stop()
-                this.currentLyric = null
+                this.currentLyric = []
                 this.playingLyric = ''
                 this.currentLineNum = 0
             }
@@ -419,11 +423,6 @@ export default {
         playing() {
             const audio = this.$refs.audio
             this.playing ? audio.play() : audio.pause()
-        },
-        currentTime(){
-            if(this.currentTime && this.currentLyric && this.playing){
-                this.currentLyric.seek(this.currentTime * 1000)
-            }
         }
     },
     components: {
