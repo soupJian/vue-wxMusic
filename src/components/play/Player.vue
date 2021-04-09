@@ -227,11 +227,7 @@ export default {
             if(res.lrc){
                 // res.data.lyric // 歌词数据
                 this.currentLyric = parseLyric(res.lrc.lyric)
-                this.currentLyric.forEach((item,index)=>{
-                    if(item.line == ''){
-                        this.currentLyric.splice(index,1)
-                    }
-                })
+                
             } else {
                 // 获取不到歌词清空
                 this.currentLyric = []
@@ -335,12 +331,7 @@ export default {
                     this.playingLyric = this.currentLyric[i].line
                     if (i > 5) { // 歌词 > 5 并且手指处于非滑动状态
                         let lineEl = this.$refs.lyricLine[i - 5]
-                        if(this.touch.initiated){
-                            clearTimeout(this.time)
-                            this.time = setTimeout(()=>{
-                                this.$refs.lyricList.scrollToElement(lineEl, 1000)// 滚动到元素
-                            },2000)
-                        }else{
+                        if(this.touch.scrollLyric){
                             this.$refs.lyricList.scrollToElement(lineEl, 1000)// 滚动到元素
                         }
                     }
@@ -363,8 +354,10 @@ export default {
             this.$refs.audio.currentTime = currentTime
         },
         middleTouchStart(e) {
-            this.touch.initiated = true
             const touch = e.touches[0]
+            this.touch.initiated = true
+            // 滑动时候歌词是否允许滚动
+            this.touch.scrollLyric = true
             this.touch.startX = touch.pageX
             this.touch.startY = touch.pageY
         },
@@ -375,8 +368,15 @@ export default {
             const touch = e.touches[0]
             const deltaX = touch.pageX - this.touch.startX
             const deltaY = touch.pageY - this.touch.startY
-            // 纵轴滚动偏差绝对值大于横轴滚动偏差绝对值，不该移动。只支持横向移动。
+            // 纵向滚动
             if (Math.abs(deltaY) > Math.abs(deltaX)) {
+                if(this.currentShow == 'lyric'){
+                    this.touch.scrollLyric = false
+                    clearTimeout(this.time)
+                    this.time = setTimeout(()=>{
+                        this.touch.scrollLyric = true
+                    },2000)
+                }
                 return
             }
             // 歌词偏移量限制
