@@ -1,7 +1,6 @@
 import axios from 'axios'
 const baseUrl = 'https://music-soupjian.vercel.app'
 const service = axios.create({
-  
   method: 'get'
 })
 service.interceptors.request.use(config=>{
