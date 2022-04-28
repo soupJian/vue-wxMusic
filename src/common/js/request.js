@@ -1,7 +1,7 @@
 import axios from 'axios'
 const baseUrl = 'https://music-soupjian.vercel.app'
 const service = axios.create({
-  withCredentials: true,
+  
   method: 'get'
 })
 service.interceptors.request.use(config=>{
@@ -16,7 +16,8 @@ export const request = (params) => {
   // const baseUrl = '/api';
   let url = `${baseUrl}${params.url}`;
   return service({
-    url
+    url,
+    withCredentials: true
   });
 };
 export const requestCookie = (params) => {
@@ -24,6 +25,7 @@ export const requestCookie = (params) => {
   const cookie = localStorage.getItem('cookie');
   let url = `${baseUrl}${params.url}?cookie=${cookie}`;
   return service({
-    url
+    url,
+    withCredentials: true
   });
 };
